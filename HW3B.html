@@ -103,18 +103,18 @@ vec4 sceneSDF(vec3 samplePoint) {
     vec3 boxPoint = (rotateX(tick) * vec4(translatedSample, 1.0)).xyz;
     boxPoint = (rotateY(radians(tick * 1.5)) * vec4(boxPoint, 1.0)).xyz;
     boxPoint = (rotateZ(radians(tick * 2.0)) * vec4(boxPoint, 1.0)).xyz;
-    float torus = sdTorus(torusPoint, vec2(0.55, 0.15));
-    float box = sdBox(boxPoint, vec3(0.20, 0.20, 0.20));
+    float torus = sdTorus(torusPoint, vec2(0.65, 0.25));
+    float box = sdBox(boxPoint, vec3(0.10, 0.30, 0.30));
     float newbox = sdBox(boxPoint, vec3(0.5, 0.5, 0.5));
     float objectSet = mix(newbox, smin(torus, box, 10.0), sin(tick/3.0) / 2.0 + 0.5);
     // separate object
     translatedSample = (rotateX(tick * 0.5) * vec4(samplePoint + vec3(0.5, 0.5, 0.0), 1.0)).xyz;
     translatedSample = (rotateY(tick * 0.5) * vec4(translatedSample, 1.0)).xyz;
-    float cyl = sdCappedCylinder(translatedSample, vec2(0.25, 0.25));
+    float cyl = sdCappedCylinder(translatedSample, vec2(0.5, 0.5));
     if (cyl < objectSet) {
         return vec4(cyl, translatedSample);
     } else {
-        return vec4(objectSet, -1.0, -1.0, -1.0);
+        return vec4(objectSet, -1.0, -1.5, -2.0);
     }
 }
 // http://jamie-wong.com/2016/07/15/ray-marching-signed-distance-functions/#rotation-and-translation
@@ -150,8 +150,8 @@ vec3 rayDirection(float fieldOfView, vec2 size) {
     return normalize(vec3(xy, -z));
 }
 void main() {
-	vec3 dir = rayDirection(45.0, resolution);
-    vec3 eye = vec3(0.0, 0.0, 5.0);
+	vec3 dir = rayDirection(90.0, resolution);
+    vec3 eye = vec3(0.5, 0.0, 3.5);
     vec4 result = shortestDistanceToSurface(eye, dir, MIN_DIST, MAX_DIST);
     float dist = result.x;
     // use transformed object hit point for texture positioning if its the cylinder
@@ -159,7 +159,7 @@ void main() {
 
     if (dist > MAX_DIST - EPSILON) {
         // Didn't hit anything
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+        gl_FragColor = vec4(0.0, 0.3, 0.2, 0.0);
 		return;
     }
     vec3 Kd;
@@ -245,34 +245,22 @@ function init() {
     console.log(container)
     width = window.innerWidth;
     height = window.innerHeight;
-    camera = new THREE.OrthographicCamera(
-        width , width , height , height ,
-        -1, 1
-    );
-    // let camera = new THREE.OrthographicCamera(
-    //     width / - 2, width / 2, height / 2, height / - 2,
-    //     -1, 1
-    // );
+    camera = new THREE.OrthographicCamera(width , width , height , height ,  -1, 1);
 
     scene = new THREE.Scene();
 
     renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( 640, 640);
-    renderer.setClearColor(new THREE.Color(0x000000), 1)
-    container.appendChild( renderer.domElement );
-
+		renderer.setClearColor( 0x999999 );
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		container.appendChild( renderer.domElement );
     plane = generate_plane(renderer.domElement);
     scene.add(plane);
-
     state = {camera, scene, renderer, container, plane};
-
-    //make it so that resizing the browser window also resizes the scene
-//    window.addEventListener('resize', () => { onWindowResize(state) }, false);
+		window.addEventListener( 'resize', onWindowResize, false );
 
     function render() {
         animate(state);
-
         state.renderer.render(state.scene, state.camera);
         requestAnimationFrame(render);
     }
