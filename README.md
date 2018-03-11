@@ -4,7 +4,7 @@
 ### None.
 
 ## Homework 3B
-### I used solely the Fragment Shader to create 2 moving geometries: 1 as a plain blue color and 1 with a rainbow texture. These geometries change (and even split apart and rejoin) overtime.
+### I used solely the Fragment Shader to create 2 moving geometries: 1 as a plain blue color and 1 with a rainbow texture. These geometries change (and even split apart and rejoin) overtime. They also react to light.
 
 ## Homework 3C
 ### This is a PDF describing my final project ideas and teammates. We will be focusing of Deferred Shading.
